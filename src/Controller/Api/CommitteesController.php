@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller\Api;
 
+use AppBundle\Controller\ReferentEmailControllerTrait;
 use AppBundle\Entity\Committee;
 use AppBundle\History\CommitteeMembershipHistoryHandler;
 use AppBundle\Repository\AdherentRepository;
@@ -17,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CommitteesController extends Controller
 {
+    use ReferentEmailControllerTrait;
+
     /**
      * @Route("/committees", name="api_committees")
      * @Method("GET")
@@ -27,13 +30,17 @@ class CommitteesController extends Controller
     }
 
     /**
-     * @Route("/committees/count-for-referent-area", name="app_committees_count_for_referent_area")
+     * @Route("/statistics/committees/count-for-referent-area", name="app_committees_count_for_referent_area")
      * @Method("GET")
-     * @Security("is_granted('ROLE_REFERENT')")
+     *
+     * @Security("is_granted('ROLE_OAUTH_SCOPE_READ:STATS')")
      */
-    public function getCommitteeCountersAction(AdherentRepository $adherentRepository, CommitteeRepository $committeeRepository): Response
-    {
-        $referent = $this->getUser();
+    public function getCommitteeCountersAction(
+        Request $request,
+        AdherentRepository $adherentRepository,
+        CommitteeRepository $committeeRepository
+    ): Response {
+        $referent = $this->getReferent($request, $adherentRepository);
 
         return new JsonResponse([
             'committees' => $committeeRepository->countApprovedForReferent($referent),
@@ -43,15 +50,17 @@ class CommitteesController extends Controller
     }
 
     /**
-     * @Route("/committees/members/count-by-month", name="app_committee_members_count_by_month_for_referent_area")
+     * @Route("/statistics/committees/members/count-by-month", name="app_committee_members_count_by_month_for_referent_area")
      * @Method("GET")
-     * @Security("is_granted('ROLE_REFERENT')")
+     *
+     * @Security("is_granted('ROLE_OAUTH_SCOPE_READ:STATS')")
      */
     public function getMembersCommitteeCountAction(
         Request $request,
+        AdherentRepository $adherentRepository,
         CommitteeMembershipHistoryHandler $committeeMembershipHistoryHandler
     ): Response {
-        $referent = $this->getUser();
+        $referent = $this->getReferent($request, $adherentRepository);
 
         $filter = StatisticsParametersFilter::createFromRequest($request, $this->getDoctrine()->getRepository(Committee::class));
 
@@ -59,13 +68,17 @@ class CommitteesController extends Controller
     }
 
     /**
-     * @Route("/committees/top-5-in-referent-area", name="app_most_active_committees")
+     * @Route("/statistics/committees/top-5-in-referent-area", name="app_most_active_committees")
      * @Method("GET")
-     * @Security("is_granted('ROLE_REFERENT')")
+     *
+     * @Security("is_granted('ROLE_OAUTH_SCOPE_READ:STATS')")
      */
-    public function getTopCommitteesInReferentManagedAreaAction(CommitteeRepository $committeeRepository): Response
-    {
-        $referent = $this->getUser();
+    public function getTopCommitteesInReferentManagedAreaAction(
+        Request $request,
+        AdherentRepository $adherentRepository,
+        CommitteeRepository $committeeRepository
+    ): Response {
+        $referent = $this->getReferent($request, $adherentRepository);
 
         return new JsonResponse([
             'most_active' => $committeeRepository->retrieveMostActiveCommitteesInReferentManagedArea($referent),

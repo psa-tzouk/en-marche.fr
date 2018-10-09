@@ -2,8 +2,9 @@
 
 namespace AppBundle\Controller\Api;
 
+use AppBundle\Controller\ReferentEmailControllerTrait;
+use AppBundle\Repository\AdherentRepository;
 use AppBundle\Repository\CommitteeRepository;
-use AppBundle\Repository\CitizenActionRepository;
 use AppBundle\Repository\EventRegistrationRepository;
 use AppBundle\Repository\EventRepository;
 use AppBundle\Statistics\StatisticsParametersFilter;
@@ -16,13 +17,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-/**
- * @Route("/events")
- */
 class EventsController extends Controller
 {
+    use ReferentEmailControllerTrait;
+
     /**
-     * @Route("", name="api_committees_events")
+     * @Route("/events", name="api_committees_events")
      * @Method("GET")
      */
     public function getUpcomingCommitteesEventsAction(Request $request): Response
@@ -31,13 +31,19 @@ class EventsController extends Controller
     }
 
     /**
-     * @Route("/count-by-month", name="app_committee_events_count_by_month")
+     * @Route("/statistics/events/count-by-month", name="app_committee_events_count_by_month")
      * @Method("GET")
-     * @Security("is_granted('ROLE_REFERENT')")
+     *
+     * @Security("is_granted('ROLE_OAUTH_SCOPE_READ:STATS')")
      */
-    public function eventsCountInReferentManagedAreaAction(Request $request, EventRepository $eventRepository, EventRegistrationRepository $eventRegistrationRepository, CommitteeRepository $committeeRepository): Response
-    {
-        $referent = $this->getUser();
+    public function eventsCountInReferentManagedAreaAction(
+        Request $request,
+        AdherentRepository $adherentRepository,
+        EventRepository $eventRepository,
+        EventRegistrationRepository $eventRegistrationRepository,
+        CommitteeRepository $committeeRepository
+    ): Response {
+        $referent = $this->getReferent($request, $adherentRepository);
         try {
             $filter = StatisticsParametersFilter::createFromRequest($request, $committeeRepository);
         } catch (\InvalidArgumentException $e) {
@@ -46,18 +52,22 @@ class EventsController extends Controller
 
         return new JsonResponse([
             'events' => $eventRepository->countCommitteeEventsInReferentManagedArea($referent, $filter),
-            'event_participants' => $eventRegistrationRepository->countEventParticipantsInReferentManagedArea($this->getUser(), $filter),
+            'event_participants' => $eventRegistrationRepository->countEventParticipantsInReferentManagedArea($referent, $filter),
         ]);
     }
 
     /**
-     * @Route("/count", name="app_events_count")
+     * @Route("/statistics/events/count", name="app_events_count")
      * @Method("GET")
-     * @Security("is_granted('ROLE_REFERENT')")
+     *
+     * @Security("is_granted('ROLE_OAUTH_SCOPE_READ:STATS')")
      */
-    public function allTypesEventsCountInReferentManagedAreaAction(EventRepository $eventRepository, CitizenActionRepository $citizenActionRepository): Response
-    {
-        $referent = $this->getUser();
+    public function allTypesEventsCountInReferentManagedAreaAction(
+        Request $request,
+        AdherentRepository $adherentRepository,
+        EventRepository $eventRepository
+    ): Response {
+        $referent = $this->getReferent($request, $adherentRepository);
 
         return new JsonResponse([
             'current_total' => $eventRepository->countTotalEventsInReferentManagedAreaForCurrentMonth($referent),
@@ -67,13 +77,18 @@ class EventsController extends Controller
     }
 
     /**
-     * @Route("/count-participants", name="app_committee_events_count_participants")
+     * @Route("/statistics/events/count-participants", name="app_committee_events_count_participants")
      * @Method("GET")
-     * @Security("is_granted('ROLE_REFERENT')")
+     *
+     * @Security("is_granted('ROLE_OAUTH_SCOPE_READ:STATS')")
      */
-    public function eventsCountInReferentManagedArea(EventRepository $eventRepository, EventRegistrationRepository $eventRegistrationRepository): Response
-    {
-        $referent = $this->getUser();
+    public function eventsCountInReferentManagedArea(
+        Request $request,
+        AdherentRepository $adherentRepository,
+        EventRepository $eventRepository,
+        EventRegistrationRepository $eventRegistrationRepository
+    ): Response {
+        $referent = $this->getReferent($request, $adherentRepository);
 
         return new JsonResponse([
             'total' => $eventRepository->countParticipantsInReferentManagedArea($referent),

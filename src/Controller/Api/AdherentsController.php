@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller\Api;
 
+use AppBundle\Controller\ReferentEmailControllerTrait;
 use AppBundle\History\CommitteeMembershipHistoryHandler;
 use AppBundle\Membership\AdherentManager;
 use AppBundle\History\EmailSubscriptionHistoryHandler;
@@ -11,14 +12,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Route("/adherents")
- * @Security("is_granted('ROLE_REFERENT')")
+ * @Route("/statistics/adherents")
+ *
+ * @Security("is_granted('ROLE_OAUTH_SCOPE_READ:STATS')")
  */
 class AdherentsController extends Controller
 {
+    use ReferentEmailControllerTrait;
+
     /**
      * @Route("/count", name="app_adherents_count")
      * @Method("GET")
@@ -35,12 +40,13 @@ class AdherentsController extends Controller
      * @Method("GET")
      */
     public function adherentsCountForReferentManagedAreaAction(
+        Request $request,
         AdherentRepository $adherentRepository,
         EmailSubscriptionHistoryHandler $historyHandler,
         AdherentManager $adherentManager,
         CommitteeMembershipHistoryHandler $committeeMembershipHistoryHandler
     ): Response {
-        $referent = $this->getUser();
+        $referent = $this->getReferent($request, $adherentRepository);
         $count = $adherentRepository->countByGenderManagedBy($referent);
 
         return new JsonResponse(
