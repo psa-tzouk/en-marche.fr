@@ -54,7 +54,7 @@ class CitizenProject extends BaseGroup
     public const SIMPLE_TYPE = 'simple';
     public const TURKNEY_TYPE = 'turkney';
 
-    public const TYPE = [
+    private const TYPE = [
         self::SIMPLE_TYPE => 'Projet simple',
         self::TURKNEY_TYPE => 'Projet clé en main',
     ];
@@ -746,7 +746,7 @@ class CitizenProject extends BaseGroup
 
     public function getTypeOfProject(): string
     {
-        if ($this->turnkeyProject) {
+        if ($this->isFromTurnkeyProject()) {
             return self::TYPE[self::TURKNEY_TYPE];
         }
 

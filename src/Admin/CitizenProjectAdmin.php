@@ -369,13 +369,13 @@ class CitizenProjectAdmin extends AbstractAdmin
                     'choices' => [
                         'Projets simples' => CitizenProject::SIMPLE_TYPE,
                         'Projets clés en main' => CitizenProject::TURKNEY_TYPE,
-                    ]
+                    ],
                 ],
                 'callback' => function (ProxyQuery $qb, string $alias, string $field, array $value) {
                     $qb->andWhere(\sprintf('%s.turnkeyProject is %s', $alias, CitizenProject::TURKNEY_TYPE === $value['value'] ? 'not null' : 'null'));
 
                     return true;
-                }
+                },
             ])
         ;
     }
