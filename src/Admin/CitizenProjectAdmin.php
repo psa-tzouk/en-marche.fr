@@ -361,6 +361,22 @@ class CitizenProjectAdmin extends AbstractAdmin
             ->add('featured', null, [
                 'label' => 'Coup de coeur',
             ])
+            ->add('turnkeyProject', CallbackFilter::class, [
+                'label' => 'Type de projet',
+                'show_filter' => true,
+                'field_type' => ChoiceType::class,
+                'field_options' => [
+                    'choices' => [
+                        'Projets simples' => 'simple',
+                        'Projets clés en main' => 'turnkey',
+                    ]
+                ],
+                'callback' => function (ProxyQuery $qb, string $alias, string $field, array $value) {
+                    $qb->andWhere(\sprintf('%s.turnkeyProject is %s', $alias, 'turnkey' === $value['value'] ? 'not null' : 'null'));
+
+                    return true;
+                }
+            ])
         ;
     }
 
@@ -372,6 +388,10 @@ class CitizenProjectAdmin extends AbstractAdmin
     protected function configureListFields(ListMapper $listMapper)
     {
         $listMapper
+            ->add('turnkeyProject', null, [
+                'label' => 'Type de projet',
+                'template' => 'admin/citizen_project/type.html.twig',
+            ])
             ->add('name', null, [
                 'label' => 'Nom',
                 'template' => 'admin/citizen_project/list_name.html.twig',
