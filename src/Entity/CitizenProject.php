@@ -51,6 +51,14 @@ class CitizenProject extends BaseGroup
         self::PRE_REFUSED,
     ];
 
+    public const SIMPLE_TYPE = 'simple';
+    public const TURKNEY_TYPE = 'turkney';
+
+    public const TYPE = [
+        self::SIMPLE_TYPE => 'Projet simple',
+        self::TURKNEY_TYPE => 'Projet clé en main',
+    ];
+
     /**
      * @ORM\Column
      *
@@ -734,5 +742,14 @@ class CitizenProject extends BaseGroup
     public function isNotFinalStatus(): bool
     {
         return \in_array($this->status, self::NOT_FINAL_STATUSES, true);
+    }
+
+    public function getTypeOfProject(): string
+    {
+        if ($this->turnkeyProject) {
+            return self::TYPE[self::TURKNEY_TYPE];
+        }
+
+        return self::TYPE[self::SIMPLE_TYPE];
     }
 }

@@ -367,12 +367,12 @@ class CitizenProjectAdmin extends AbstractAdmin
                 'field_type' => ChoiceType::class,
                 'field_options' => [
                     'choices' => [
-                        'Projets simples' => 'simple',
-                        'Projets clés en main' => 'turnkey',
+                        'Projets simples' => CitizenProject::SIMPLE_TYPE,
+                        'Projets clés en main' => CitizenProject::TURKNEY_TYPE,
                     ]
                 ],
                 'callback' => function (ProxyQuery $qb, string $alias, string $field, array $value) {
-                    $qb->andWhere(\sprintf('%s.turnkeyProject is %s', $alias, 'turnkey' === $value['value'] ? 'not null' : 'null'));
+                    $qb->andWhere(\sprintf('%s.turnkeyProject is %s', $alias, CitizenProject::TURKNEY_TYPE === $value['value'] ? 'not null' : 'null'));
 
                     return true;
                 }
@@ -462,6 +462,9 @@ class CitizenProjectAdmin extends AbstractAdmin
             'Statut' => 'status',
             'Comités en soutien' => 'exportCommitteeSupports',
             'Coup de coeur' => 'featured',
+            'Code postal' => 'postAddress.postalCode',
+            'Type de projet' => 'getTypeOfProject',
+            'Sous-titre' => 'subtitle',
         ];
     }
 }
