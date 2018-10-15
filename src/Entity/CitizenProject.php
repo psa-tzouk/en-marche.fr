@@ -54,9 +54,9 @@ class CitizenProject extends BaseGroup
     public const SIMPLE_TYPE = 'simple';
     public const TURNKEY_TYPE = 'turnkey';
 
-    private const TYPE = [
+    public const TYPE = [
         self::SIMPLE_TYPE => 'Projet simple',
-        self::TURNKEY_TYPE => 'Projet clé en main',
+        self::TURNKEY_TYPE => 'Projet relié à un projet CEM',
     ];
 
     /**

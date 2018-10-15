@@ -367,8 +367,8 @@ class CitizenProjectAdmin extends AbstractAdmin
                 'field_type' => ChoiceType::class,
                 'field_options' => [
                     'choices' => [
-                        'Projets simples' => CitizenProject::SIMPLE_TYPE,
-                        'Projets clés en main' => CitizenProject::TURNKEY_TYPE,
+                        CitizenProject::TYPE[CitizenProject::SIMPLE_TYPE] => CitizenProject::SIMPLE_TYPE,
+                        CitizenProject::TYPE[CitizenProject::TURNKEY_TYPE] => CitizenProject::TURNKEY_TYPE,
                     ],
                 ],
                 'callback' => function (ProxyQuery $qb, string $alias, string $field, array $value) {
