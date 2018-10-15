@@ -366,10 +366,7 @@ class CitizenProjectAdmin extends AbstractAdmin
                 'show_filter' => true,
                 'field_type' => ChoiceType::class,
                 'field_options' => [
-                    'choices' => [
-                        CitizenProject::TYPE[CitizenProject::SIMPLE_TYPE] => CitizenProject::SIMPLE_TYPE,
-                        CitizenProject::TYPE[CitizenProject::TURNKEY_TYPE] => CitizenProject::TURNKEY_TYPE,
-                    ],
+                    'choices' => array_flip(CitizenProject::TYPE),
                 ],
                 'callback' => function (ProxyQuery $qb, string $alias, string $field, array $value) {
                     $qb->andWhere(sprintf('%s.turnkeyProject is %s', $alias, CitizenProject::TURNKEY_TYPE === $value['value'] ? 'not null' : 'null'));
