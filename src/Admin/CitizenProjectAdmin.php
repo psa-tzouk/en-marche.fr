@@ -372,7 +372,7 @@ class CitizenProjectAdmin extends AbstractAdmin
                     ],
                 ],
                 'callback' => function (ProxyQuery $qb, string $alias, string $field, array $value) {
-                    $qb->andWhere(\sprintf('%s.turnkeyProject is %s', $alias, CitizenProject::TURNKEY_TYPE === $value['value'] ? 'not null' : 'null'));
+                    $qb->andWhere(sprintf('%s.turnkeyProject is %s', $alias, CitizenProject::TURNKEY_TYPE === $value['value'] ? 'not null' : 'null'));
 
                     return true;
                 },

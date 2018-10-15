@@ -52,7 +52,7 @@ class CitizenProject extends BaseGroup
     ];
 
     public const SIMPLE_TYPE = 'simple';
-    public const TURNKEY_TYPE = 'turkney';
+    public const TURNKEY_TYPE = 'turnkey';
 
     private const TYPE = [
         self::SIMPLE_TYPE => 'Projet simple',
